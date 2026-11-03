@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titulo %}Catálogo · {{ modelo.TITULO }}{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <div class="encabezado">
+        <h1>Catálogos</h1>
+        <a href="{{ url_for('catalogos.nuevo', tipo=tipo) }}" class="boton">+ Agregar</a>
+    </div>
+    {% include "admin/_catalogos_tabs.html" %}
+
+    <div class="tabla-scroll">
+        <table class="tabla">
+            <thead><tr><th>#</th><th>Nombre</th><th>Solicitudes</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            {% for r in registros %}
+            <tr class="{{ 'inactivo' if not r.activo }}">
+                <td>{{ r.id }}</td>
+                <td>{{ r.nombre }}</td>
+                <td>{{ r.solicitudes|length }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('catalogos.alternar_activo', tipo=tipo, id_=r.id) }}">
+                        <button type="submit" class="chip {{ 'chip-ok' if r.activo else 'chip-off' }}"
+                                title="Clic para {{ 'desactivar' if r.activo else 'activar' }}">
+                            {{ 'Activo' if r.activo else 'Inactivo' }}
+                        </button>
+                    </form>
+                </td>
+                <td class="acciones-tabla">
+                    <a href="{{ url_for('catalogos.formulario', tipo=tipo, id_=r.id) }}" class="boton-mini">Editar</a>
+                    <form method="post" action="{{ url_for('catalogos.eliminar', tipo=tipo, id_=r.id) }}"
+                          onsubmit="return confirm('¿Eliminar «{{ r.nombre }}»?');">
+                        <button type="submit" class="boton-mini peligro">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="centrado">Sin registros.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="ayuda">Los registros inactivos no aparecen en el formulario público. Un registro con solicitudes no se puede eliminar, solo desactivar.</p>
+</section>
+{% endblock %}

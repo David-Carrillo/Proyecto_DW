@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta centrado">
+    <h1>Error {{ codigo }}</h1>
+    <p>{{ mensaje }}</p>
+    <p><a class="boton" href="{{ url_for('publico.registrar') }}">Ir al inicio</a></p>
+</section>
+{% endblock %}

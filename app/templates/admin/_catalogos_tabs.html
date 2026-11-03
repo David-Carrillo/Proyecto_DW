@@ -1,0 +1,5 @@
+<nav class="tabs">
+    {% for slug, m in catalogos.items() %}
+    <a href="{{ url_for('catalogos.lista', tipo=slug) }}" class="{{ 'activo' if slug == tipo }}">{{ m.TITULO }}</a>
+    {% endfor %}
+</nav>

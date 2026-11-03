@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}{{ modelo.TITULO }}{% endblock %}
+{% block ancho %}angosto{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <div class="encabezado">
+        <h1>{{ 'Editar' if registro.id else 'Agregar' }}</h1>
+        <a href="{{ url_for('catalogos.lista', tipo=tipo) }}" class="boton-sec">← Volver</a>
+    </div>
+    <p class="subtitulo">{{ modelo.TITULO }}</p>
+    <form method="post" novalidate>
+        <div class="campo {{ 'invalido' if error }}">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" maxlength="100" value="{{ registro.nombre or '' }}" autofocus>
+            <small class="error">{{ error or '' }}</small>
+        </div>
+        <label class="check">
+            <input type="checkbox" name="activo" {{ 'checked' if registro.activo is none or registro.activo }}>
+            Activo (visible en el formulario público)
+        </label>
+        <div class="acciones">
+            <button type="submit" class="boton">Guardar</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
