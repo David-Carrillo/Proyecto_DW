@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Dashboard{% endblock %}
+{% block ancho %}ancho{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <div class="encabezado">
+        <h1>Dashboard</h1>
+        <div class="campo filtro-dashboard">
+            <label for="filtroMunicipio">Mostrar</label>
+            <select id="filtroMunicipio">
+                <option value="">Total de solicitudes (todos los municipios)</option>
+                {% for m in municipios %}<option value="{{ m.id }}">{{ m.nombre }}</option>{% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="tiles">
+        <div class="tile"><span class="tile-etiqueta">Total</span><span class="tile-valor" id="tTotal">–</span></div>
+        <div class="tile"><span class="tile-etiqueta"><i class="punto pendiente"></i>Pendientes</span><span class="tile-valor" id="tPendiente">–</span></div>
+        <div class="tile"><span class="tile-etiqueta"><i class="punto resuelto"></i>Resueltas</span><span class="tile-valor" id="tResuelto">–</span></div>
+        <div class="tile"><span class="tile-etiqueta">% atendido</span><span class="tile-valor" id="tPorcentaje">–</span></div>
+    </div>
+
+    <div class="graficas">
+        <figure class="grafica">
+            <figcaption id="tituloDona">Estatus de las solicitudes</figcaption>
+            <div class="lienzo lienzo-dona" id="graficaDona"></div>
+            <p class="sin-datos oculto" id="sinDatosDona">Aún no hay solicitudes.</p>
+        </figure>
+        <figure class="grafica grafica-ancha">
+            <figcaption>Solicitudes por municipio</figcaption>
+            <div class="lienzo" id="graficaBarras"></div>
+            <p class="sin-datos oculto" id="sinDatosBarras">Aún no hay solicitudes.</p>
+        </figure>
+    </div>
+
+    <details class="tabla-datos">
+        <summary>Ver datos en tabla</summary>
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead><tr><th>Municipio</th><th>Pendientes</th><th>Resueltas</th><th>Total</th></tr></thead>
+                <tbody id="tablaMunicipios"></tbody>
+            </table>
+        </div>
+    </details>
+</section>
+
+<section class="tarjeta">
+    <h2 class="h2">Últimos movimientos <span class="ayuda">(bitácora)</span></h2>
+    <ul class="bitacora">
+        {% for b in bitacora %}
+        <li><span class="ayuda">{{ b.fecha.strftime('%d/%m/%Y %H:%M') }}</span> · <strong>{{ b.evento|capitalize }}</strong> · {{ b.detalle }}</li>
+        {% else %}
+        <li class="ayuda">Todavía no hay movimientos.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

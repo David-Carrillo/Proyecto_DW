@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Solicitar turno' if modo == 'registrar' else 'Modificar solicitud' }}{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <h1>Ticket de Turno</h1>
+
+    {% if modo == 'modificar' %}
+    <!-- Paso 1: identificar la solicitud con CURP + turno -->
+    <form id="formBuscar" class="buscar-solicitud" novalidate>
+        <p class="subtitulo">Modificar una solicitud existente</p>
+        <p class="ayuda">Escriba la CURP del alumno y el número de turno que aparece en su comprobante.</p>
+        <div class="fila">
+            <div class="campo crece">
+                <label for="buscarCurp">CURP:</label>
+                <input type="text" id="buscarCurp" maxlength="18" placeholder="18 caracteres">
+            </div>
+            <div class="campo">
+                <label for="buscarTurno">Número de turno:</label>
+                <input type="number" id="buscarTurno" min="1" inputmode="numeric">
+            </div>
+            <div class="campo campo-boton">
+                <button type="submit" class="boton">Buscar</button>
+            </div>
+        </div>
+        <small class="error" id="errorBuscar"></small>
+    </form>
+    {% endif %}
+
+    <form id="formTurno" novalidate data-modo="{{ modo }}" {% if modo == 'modificar' %}class="oculto"{% endif %}>
+        {% if modo == 'modificar' %}<p class="aviso aviso-info" id="infoEdicion"></p>{% endif %}
+        <div class="fila">
+            <div class="campo crece">
+                <label for="tramitante">Nombre completo de quien realizará el trámite:</label>
+                <input type="text" id="tramitante" name="tramitante" maxlength="80" placeholder="Ej. María López García">
+                <small class="error"></small>
+            </div>
+            <div class="campo">
+                <label for="curp">CURP:</label>
+                <input type="text" id="curp" name="curp" maxlength="18" placeholder="18 caracteres">
+                <small class="error"></small>
+            </div>
+        </div>
+
+        <p class="subtitulo">Datos del alumno</p>
+        <div class="fila">
+            <div class="campo crece">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" maxlength="40">
+                <small class="error"></small>
+            </div>
+            <div class="campo crece">
+                <label for="paterno">Paterno:</label>
+                <input type="text" id="paterno" name="paterno" maxlength="40">
+                <small class="error"></small>
+            </div>
+            <div class="campo crece">
+                <label for="materno">Materno:</label>
+                <input type="text" id="materno" name="materno" maxlength="40" placeholder="Opcional">
+                <small class="error"></small>
+            </div>
+        </div>
+
+        <div class="fila">
+            <div class="campo">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" maxlength="10" inputmode="numeric" placeholder="Opcional">
+                <small class="error"></small>
+            </div>
+            <div class="campo">
+                <label for="celular">Celular:</label>
+                <input type="tel" id="celular" name="celular" maxlength="10" inputmode="numeric">
+                <small class="error"></small>
+            </div>
+            <div class="campo crece">
+                <label for="correo">Correo:</label>
+                <input type="email" id="correo" name="correo" maxlength="80" placeholder="usuario@dominio.com">
+                <small class="error"></small>
+            </div>
+        </div>
+
+        <div class="campo">
+            <label for="nivel_id">¿Nivel al que desea ingresar o que ya cursa el alumno?</label>
+            <select id="nivel_id" name="nivel_id"><option value="">-- Seleccione --</option></select>
+            <small class="error"></small>
+        </div>
+
+        <div class="campo">
+            <label for="municipio_id">Municipio donde desea estudie el alumno:</label>
+            <select id="municipio_id" name="municipio_id"><option value="">-- Seleccione --</option></select>
+            <small class="error"></small>
+        </div>
+
+        <div class="campo">
+            <label for="asunto_id">Seleccione el asunto que va a tratar:</label>
+            <select id="asunto_id" name="asunto_id"><option value="">-- Seleccione --</option></select>
+            <small class="error"></small>
+        </div>
+
+        <div class="acciones">
+            <button type="submit" class="boton" id="btnGenerar">
+                {{ 'Generar Turno' if modo == 'registrar' else 'Guardar cambios' }}
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- Ventana de confirmación -->
+<div id="modal" class="modal oculto" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
+    <div class="modal-contenido">
+        <h2 id="tituloModal">¡Turno generado!</h2>
+        <p class="etiqueta-turno">Su número de turno es</p>
+        <p class="numero" id="numTurno"></p>
+        <p id="detalleTurno"></p>
+        <p class="ayuda" id="notaTurno">Guarde su CURP y su número de turno para modificar su solicitud.</p>
+        <div class="botones-modal">
+            <a href="#" class="boton" id="btnDescargar">Descargar comprobante PDF</a>
+            <a href="#" class="boton-sec" id="btnVerPdf" target="_blank" rel="noopener">Ver PDF</a>
+            <button type="button" class="boton-sec" id="btnCerrar">Cerrar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/solicitud.js') }}"></script>
+{% endblock %}
