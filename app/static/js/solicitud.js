@@ -134,13 +134,41 @@ class FormularioSolicitud {
             error.textContent = "Escriba una CURP válida y su número de turno.";
             return;
         }
+        const opciones = this.$("opcionesSolicitud");
+        opciones.innerHTML = "";
+        opciones.classList.add("oculto");
+        this.form.classList.add("oculto");
+
         const r = await this.api.consultar(curp, turno);
         if (!r.ok) {
             error.textContent = r.error || "No se encontró la solicitud.";
-            this.form.classList.add("oculto");
             return;
         }
-        const s = r.solicitud;
+        if (r.solicitudes.length === 1) {
+            this.cargarEdicion(r.solicitudes[0], curp, turno);
+            return;
+        }
+        // Mismo turno en varios municipios: el usuario elige cuál modificar
+        const aviso = document.createElement("p");
+        aviso.textContent = `Hay ${r.solicitudes.length} solicitudes con esa CURP y el turno ${turno}. Elija cuál desea modificar:`;
+        opciones.appendChild(aviso);
+        r.solicitudes.forEach(s => {
+            const boton = document.createElement("button");
+            boton.type = "button";
+            boton.className = "opcion-solicitud";
+            boton.innerHTML = `<strong>${s.municipio}</strong> · Turno ${s.turno} (${s.folio})<br>` +
+                              `<span class="ayuda">${s.asunto} · ${s.nivel} · ${s.estatus}</span>`;
+            boton.addEventListener("click", () => {
+                opciones.querySelectorAll(".opcion-solicitud").forEach(b => b.classList.remove("seleccionada"));
+                boton.classList.add("seleccionada");
+                this.cargarEdicion(s, curp, turno);
+            });
+            opciones.appendChild(boton);
+        });
+        opciones.classList.remove("oculto");
+    }
+
+    cargarEdicion(s, curp, turno) {
         this.edicion = { id: s.id, curp, turno };
         this.ids.forEach(id => { this.$(id).value = s[id] ?? ""; this.mostrar(id, ""); });
         this.$("infoEdicion").textContent =

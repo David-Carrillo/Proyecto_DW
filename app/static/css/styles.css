@@ -120,6 +120,14 @@ input:focus, select:focus {
 
 .buscar-solicitud { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px dashed var(--borde); }
 .buscar-solicitud .ayuda { margin-bottom: 10px; }
+.opciones-solicitud { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.opcion-solicitud {
+    text-align: left; padding: 10px 14px; background: #fff;
+    border: 1px solid var(--borde); border-radius: 8px; line-height: 1.5;
+}
+.opcion-solicitud:hover { border-color: var(--azul-claro); background: #f5f8fe; }
+.opcion-solicitud.seleccionada { border-color: var(--azul-claro); background: #e8f0fc; box-shadow: 0 0 0 2px rgba(59, 111, 216, .25); }
+.opcion-solicitud .ayuda { margin: 0; }
 
 .captcha { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
 .captcha img { border: 1px solid var(--borde); border-radius: 5px; max-width: 100%; }
