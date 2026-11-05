@@ -54,14 +54,25 @@ class SolicitudService(Sujeto, metaclass=SingletonMeta):
     def obtener(self, id_):
         return Solicitud.obtener(id_)
 
-    def por_curp_y_turno(self, curp: str, turno) -> Solicitud | None:
+    def por_curp_y_turno(self, curp: str, turno) -> list[Solicitud]:
+        """Como el turno se reinicia en cada municipio, la misma CURP puede
+        tener el mismo número de turno en varios municipios: se regresan todas."""
         try:
             turno = int(turno)
         except (TypeError, ValueError):
-            return None
+            return []
         return (Solicitud.query
                 .filter_by(curp=(curp or "").strip().upper(), turno=turno)
-                .order_by(Solicitud.creado.desc()).first())
+                .order_by(Solicitud.creado.desc()).all())
+
+    @staticmethod
+    def pertenece(solicitud: Solicitud, curp: str, turno) -> bool:
+        """True si la CURP y el turno corresponden a ESA solicitud."""
+        try:
+            return (solicitud.curp == (curp or "").strip().upper()
+                    and solicitud.turno == int(turno))
+        except (TypeError, ValueError):
+            return False
 
     def buscar(self, texto: str = "", estatus: str = "", municipio_id=None):
         """Busca por CURP o por nombre (alumno o quien hace el trámite)."""

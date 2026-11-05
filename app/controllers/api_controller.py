@@ -83,8 +83,7 @@ class SolicitudesAPI(RecursoAPI):
         datos = self.json_entrada()
         if not current_user.is_authenticated:
             # El público debe comprobar que es su solicitud: CURP + turno originales
-            original = self.servicio.por_curp_y_turno(datos.get("auth_curp"), datos.get("auth_turno"))
-            if not original or original.id != solicitud.id:
+            if not self.servicio.pertenece(solicitud, datos.get("auth_curp"), datos.get("auth_turno")):
                 return jsonify(ok=False, error="La CURP y el turno no coinciden."), 403
             estatus = None
         else:
@@ -102,10 +101,11 @@ class SolicitudesAPI(RecursoAPI):
 
 class ConsultaAPI(RecursoAPI):
     def get(self):
-        solicitud = self.servicio.por_curp_y_turno(request.args.get("curp"), request.args.get("turno"))
-        if not solicitud:
+        encontradas = self.servicio.por_curp_y_turno(request.args.get("curp"), request.args.get("turno"))
+        if not encontradas:
             return jsonify(ok=False, error="No existe una solicitud con esa CURP y ese turno."), 404
-        return jsonify(ok=True, solicitud=solicitud.to_dict())
+        # Puede haber varias (mismo turno en distintos municipios); el usuario elige cuál
+        return jsonify(ok=True, total=len(encontradas), solicitudes=[s.to_dict() for s in encontradas])
 
 
 class EstatusAPI(RecursoAPI):
