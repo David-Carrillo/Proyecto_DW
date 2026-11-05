@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if solicitud else 'Nueva' }} solicitud{% endblock %}
+{% macro texto(id, etiqueta, max, extra='') %}
+<div class="campo {{ extra }} {{ 'invalido' if errores.get(id) }}">
+    <label for="{{ id }}">{{ etiqueta }}</label>
+    <input type="text" id="{{ id }}" name="{{ id }}" maxlength="{{ max }}" value="{{ datos.get(id) or '' }}">
+    <small class="error">{{ errores.get(id, '') }}</small>
+</div>
+{% endmacro %}
+{% macro lista(id, etiqueta, opciones) %}
+<div class="campo crece {{ 'invalido' if errores.get(id) }}">
+    <label for="{{ id }}">{{ etiqueta }}</label>
+    <select id="{{ id }}" name="{{ id }}">
+        <option value="">-- Seleccione --</option>
+        {% for o in opciones %}
+        <option value="{{ o.id }}" {{ 'selected' if datos.get(id)|string == o.id|string }}>{{ o.nombre }}</option>
+        {% endfor %}
+    </select>
+    <small class="error">{{ errores.get(id, '') }}</small>
+</div>
+{% endmacro %}
+{% block contenido %}
+<section class="tarjeta">
+    <div class="encabezado">
+        <h1>{{ 'Editar solicitud ' ~ solicitud.folio if solicitud else 'Nueva solicitud' }}</h1>
+        <a href="{{ url_for('admin.lista') }}" class="boton-sec">← Volver</a>
+    </div>
+    {% if solicitud %}
+    <p class="ayuda">Turno <strong>{{ solicitud.turno }}</strong> de {{ solicitud.municipio.nombre }}.
+        Si cambia el municipio se asignará un turno nuevo en ese municipio.</p>
+    {% endif %}
+    {% if errores.get('general') %}<div class="aviso aviso-error">{{ errores.general }}</div>{% endif %}
+
+    <form method="post" novalidate>
+        <div class="fila">
+            {{ texto('tramitante', 'Quien realiza el trámite', 80, 'crece') }}
+            {{ texto('curp', 'CURP', 18) }}
+        </div>
+        <p class="subtitulo">Datos del alumno</p>
+        <div class="fila">
+            {{ texto('nombre', 'Nombre', 40, 'crece') }}
+            {{ texto('paterno', 'Paterno', 40, 'crece') }}
+            {{ texto('materno', 'Materno (opcional)', 40, 'crece') }}
+        </div>
+        <div class="fila">
+            {{ texto('telefono', 'Teléfono (opcional)', 10) }}
+            {{ texto('celular', 'Celular', 10) }}
+            {{ texto('correo', 'Correo', 80, 'crece') }}
+        </div>
+        <div class="fila">
+            {{ lista('nivel_id', 'Nivel', niveles) }}
+            {{ lista('municipio_id', 'Municipio', municipios) }}
+            {{ lista('asunto_id', 'Asunto', asuntos) }}
+        </div>
+        {% if solicitud %}
+        <div class="campo">
+            <label for="estatus">Estatus</label>
+            <select id="estatus" name="estatus">
+                {% for e in estatus_opciones %}
+                <option value="{{ e }}" {{ 'selected' if datos.get('estatus') == e }}>{{ e }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <div class="acciones">
+            <button type="submit" class="boton">{{ 'Guardar cambios' if solicitud else 'Registrar solicitud' }}</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
